@@ -57,7 +57,7 @@ public class Airport extends Thread implements Runnable{
 	}
 		
 	private void generateTraffic() {
-		for (Airplane arrival : getArrivals(mean)) {
+		for (Airplane arrival : getPlanes(mean, true)) {
 			if((arrivalsQueue.size() >= maxPlanesPerQueue)) {
 				rejected.add(arrival);
 				System.out.println(arrival + " cannot land because the queue is full");
@@ -68,7 +68,7 @@ public class Airport extends Thread implements Runnable{
 			}
 		}
 		
-		for (Airplane departure : getDepartures(mean)) {
+		for (Airplane departure : getPlanes(mean, false)) {
 			if((departuresQueue.size() >= maxPlanesPerQueue)) {
 				rejected.add(departure);
 				System.out.println(departure + " cannot take off because the queue is full");
@@ -118,25 +118,15 @@ public class Airport extends Thread implements Runnable{
 		System.out.println(" Average waiting time, take-offs: " +totalDepartureWaitingTime/departed.size());
 	}
 	
-	private ArrayList<Airplane> getArrivals(double randNum) {
+	private ArrayList<Airplane> getPlanes(double randNum, Boolean isArrival) {
 		ArrayList<Airplane> arrivals = new ArrayList<Airplane>();
-		int numArrivals = getPoissonRandom(randNum);
-		for(int i = 0; i < numArrivals; i++) {
-			arrivals.add(new Airplane(getID(), true, counter));
+		for(int i = 0; i < getPoissonRandom(randNum); i++) {
+			arrivals.add(new Airplane(genID(), isArrival, counter));
 		}
 		return arrivals;
 	}
 	
-	private ArrayList<Airplane> getDepartures(double randNum) {
-		ArrayList<Airplane> departures = new ArrayList<Airplane>();
-		int numDepartures = getPoissonRandom(randNum);
-		for(int i = 0; i < numDepartures; i++) {
-			departures.add(new Airplane(getID(), false, counter));
-		}
-		return departures;
-	}
-	
-	private int getID() {
+	private int genID() {
 		ids++;
 		return ids;
 	}
