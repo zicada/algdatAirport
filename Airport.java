@@ -112,10 +112,10 @@ public class Airport extends Thread implements Runnable{
 		System.out.println("\n ******* Results after " + intervals + " intervals ******\n ");
 		System.out.println(" Total landed: " + landedList.size());
 		System.out.println(" Total taken off: " + takenOffList.size());
-		System.out.println(" Total arriving: " + arriving.size());
-		System.out.println(" Total departing: " + departing.size());
+		System.out.println(" Total still arriving: " + arriving.size());
+		System.out.println(" Total still departing: " + departing.size());
 		System.out.println(" Total rejected: " + rejected.size());
-		System.out.println(" Airport was empty for: " + emptyRuns + " time slices");
+		System.out.println(" Airport was empty for: " + emptyRuns + " iterations");
 		System.out.println(" Time Airport was empty: " +(emptyRuns*100)/intervals + "%");
 		
 		double arrivedWaitingTime = 0;
