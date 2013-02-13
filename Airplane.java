@@ -5,24 +5,25 @@ public class Airplane {
 	
 	private int id;
 	private Boolean arriving = false;
-	private int waiting;
+	private double timeCreated;
 	
-	public Airplane(int id, Boolean arriving) {
+	public Airplane(int id, Boolean arriving, double timeCreated) {
+		this.timeCreated = timeCreated;
 		this.id = id;
 		this.arriving = arriving;
-		waiting = 0;
 	}
+
 	
-	public void addWaitingIncrement() {
-		waiting++;
-	}
-	
-	public int getWaiting() {
-		return waiting;
+	public double getWaiting(double currTime) {
+		return currTime - timeCreated;
 	}
 	
 	public int getId() {
 		return id;
+	}
+	
+	public double getTimeCreated() {
+		return timeCreated;
 	}
 	
 	public String toString() {
