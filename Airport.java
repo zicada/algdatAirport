@@ -7,7 +7,7 @@ public class Airport extends Thread implements Runnable{
 	
 	private int speed;
 	private int intervals;
-	private double counter;
+	private double time;
 	private double mean;
 	private int ids;
 	private int maxPlanesPerQueue;
@@ -22,7 +22,7 @@ public class Airport extends Thread implements Runnable{
 	private ArrayList<Airplane> rejected;
 	
 	public Airport(int intervals, int speed, double mean, int maxPlanesPerQueue) {
-		counter = 1;
+		time = 1;
 		ids = 0;
 		totalArrivals = 0;
 		this.speed = speed;
@@ -37,8 +37,8 @@ public class Airport extends Thread implements Runnable{
 	}
 	
 	public void run() {
-		while(counter <= intervals) {
-			System.out.print((int) counter + ": ");
+		while(time <= intervals) {
+			System.out.print((int) time + ": ");
 			
 			generateTraffic();
 			updateMean();
@@ -50,8 +50,9 @@ public class Airport extends Thread implements Runnable{
 				e.printStackTrace();
 			}
 			
-			counter++;
-			if(counter > intervals)
+			time++;
+			
+			if(time > intervals)
 				printReport();
 		}
 	}
@@ -82,7 +83,7 @@ public class Airport extends Thread implements Runnable{
 	private void updateMean() {
 		// update mean, which is passed to the randomizer on each run, 
 		// making sure it doesn't run amok.
-		mean = totalArrivals / counter;
+		mean = totalArrivals / time;
 		if (mean > 1.0 || mean < 0.1)
 			mean = 0.5;
 	}
@@ -91,16 +92,16 @@ public class Airport extends Thread implements Runnable{
 		if((!arrivalsQueue.isEmpty())) {
 			Airplane plane = arrivalsQueue.dequeue();
 			arrived.add(plane);
-			totalArrivalWaitingTime += plane.getWaiting(counter);
+			totalArrivalWaitingTime += plane.getWaiting(time);
 			System.out.println(plane + " has landed successfully. Waiting time: " 
-					+ (int) plane.getWaiting(counter));
+					+ (int) plane.getWaiting(time));
 
 		} else if ((!departuresQueue.isEmpty())) {
 			Airplane plane = departuresQueue.dequeue();
 			departed.add(plane);
-			totalDepartureWaitingTime += plane.getWaiting(counter);
+			totalDepartureWaitingTime += plane.getWaiting(time);
 			System.out.println(plane + " has taken off successfully. Waiting time: " 
-					+ (int) plane.getWaiting(counter));
+					+ (int) plane.getWaiting(time));
 
 		} else {
 			emptyRuns++;
@@ -124,7 +125,7 @@ public class Airport extends Thread implements Runnable{
 	private ArrayList<Airplane> getPlanes(double randNum, Boolean isArrival) {
 		ArrayList<Airplane> arrivals = new ArrayList<Airplane>();
 		for(int i = 0; i < getPoissonRandom(randNum); i++) {
-			arrivals.add(new Airplane(genID(), isArrival, counter));
+			arrivals.add(new Airplane(genID(), isArrival, time));
 		}
 		return arrivals;
 	}
