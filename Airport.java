@@ -122,9 +122,9 @@ public class Airport extends Thread implements Runnable{
 		System.out.println(" Avg waiting time, take-offs: " + totalDepartureWaitingTime / departed.size());
 	}
 	
-	private ArrayList<Airplane> getPlanes(double randNum, Boolean isArrival) {
+	private ArrayList<Airplane> getPlanes(double mean, Boolean isArrival) {
 		ArrayList<Airplane> arrivals = new ArrayList<Airplane>();
-		for(int i = 0; i < getPoissonRandom(randNum); i++) {
+		for(int i = 0; i < getPoissonRandom(mean); i++) {
 			arrivals.add(new Airplane(genID(), isArrival, time));
 		}
 		return arrivals;
