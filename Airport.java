@@ -76,13 +76,13 @@ public class Airport extends Thread implements Runnable{
 				Airplane plane = arrivalsQueue.dequeue();
 				landedList.add(plane);
 				arriving.remove(plane);
-				System.out.println(plane + " has landed successfully. Waiting time: " +plane.waiting);
+				System.out.println(plane + " has landed successfully. Waiting time: " +plane.getWaiting());
 
 			} else if ((!departuresQueue.isEmpty())) {
 				Airplane plane = departuresQueue.dequeue();
 				takenOffList.add(plane);
 				departing.remove(plane);
-				System.out.println(plane + " has taken off successfully. Waiting time: " +plane.waiting);
+				System.out.println(plane + " has taken off successfully. Waiting time: " +plane.getWaiting());
 
 			} else {
 				emptyRuns++;
@@ -90,10 +90,10 @@ public class Airport extends Thread implements Runnable{
 			}
 			
 			for (Airplane arrival: arriving) {
-				arrival.isWaiting();
+				arrival.addWaitingIncrement();
 			}
 			for (Airplane departure: departing) {
-				departure.isWaiting();
+				departure.addWaitingIncrement();
 			}
 			
 			try {
@@ -122,11 +122,11 @@ public class Airport extends Thread implements Runnable{
 		double departedWaitingTime = 0;
 		
 		for(Airplane landed :landedList) {
-			arrivedWaitingTime += landed.waiting;
+			arrivedWaitingTime += landed.getWaiting();
 		}
 
 		for(Airplane takenOff :takenOffList) {
-			departedWaitingTime += takenOff.waiting;
+			departedWaitingTime += takenOff.getWaiting();
 		}
 		System.out.println(" Average waiting time, landings: " +arrivedWaitingTime/landedList.size());
 		System.out.println(" Average waiting time, take-offs: " +departedWaitingTime/takenOffList.size());
@@ -136,7 +136,7 @@ public class Airport extends Thread implements Runnable{
 		ArrayList<Airplane> arrivals = new ArrayList<Airplane>();
 		int numArrivals = getPoissonRandom(randNum);
 		for(int i = 0; i < numArrivals; i++) {
-			arrivals.add(new Airplane(getID(), true, false));
+			arrivals.add(new Airplane(getID(), true));
 		}
 		return arrivals;
 	}
@@ -145,7 +145,7 @@ public class Airport extends Thread implements Runnable{
 		ArrayList<Airplane> departures = new ArrayList<Airplane>();
 		int numDepartures = getPoissonRandom(randNum);
 		for(int i = 0; i < numDepartures; i++) {
-			departures.add(new Airplane(getID(), false, true));
+			departures.add(new Airplane(getID(), false));
 		}
 		return departures;
 	}
