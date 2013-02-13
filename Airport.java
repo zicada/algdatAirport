@@ -17,9 +17,8 @@ public class Airport extends Thread implements Runnable{
 	private double totalArrivals;
 	private LinkedQueue<Airplane> arrivalsQueue;
 	private LinkedQueue<Airplane> departuresQueue;
-	private ArrayList<Airplane> landedList;
-	private ArrayList<Airplane> takenOffList;
-	// the next two arraylists are used to update waiting-times, as they're much simpler to iterate over than a queue.
+	private ArrayList<Airplane> arrived;
+	private ArrayList<Airplane> departed;
 	private ArrayList<Airplane> rejected;
 	
 	public Airport(int intervals, int timeSlice, double mean, int maxPlanesPerQueue) {
@@ -32,8 +31,8 @@ public class Airport extends Thread implements Runnable{
 		this.maxPlanesPerQueue = maxPlanesPerQueue;
 		arrivalsQueue = new LinkedQueue<Airplane>();
 		departuresQueue = new LinkedQueue<Airplane>();
-		landedList = new ArrayList<Airplane>();
-		takenOffList = new ArrayList<Airplane>();
+		arrived = new ArrayList<Airplane>();
+		departed = new ArrayList<Airplane>();
 		rejected = new ArrayList<Airplane>();
 	}
 	
@@ -70,13 +69,13 @@ public class Airport extends Thread implements Runnable{
 			
 			if((!arrivalsQueue.isEmpty())) {
 				Airplane plane = arrivalsQueue.dequeue();
-				landedList.add(plane);
+				arrived.add(plane);
 				totalArrivalWaitingTime += (plane.getWaiting(counter));
 				System.out.println(plane + " has landed successfully. Waiting time: " +(int)plane.getWaiting(counter));
 
 			} else if ((!departuresQueue.isEmpty())) {
 				Airplane plane = departuresQueue.dequeue();
-				takenOffList.add(plane);
+				departed.add(plane);
 				totalDepartureWaitingTime += (plane.getWaiting(counter));
 				System.out.println(plane + " has taken off successfully. Waiting time: " +(int)plane.getWaiting(counter));
 
@@ -99,16 +98,15 @@ public class Airport extends Thread implements Runnable{
 	
 	public void printReport() {
 		System.out.println("\n ******* Results after " + intervals + " intervals ******\n ");
-		System.out.println(" Total landed: " + landedList.size());
-		System.out.println(" Total taken off: " + takenOffList.size());
+		System.out.println(" Total landed: " + arrived.size());
+		System.out.println(" Total taken off: " + departed.size());
 		System.out.println(" Total still arriving: " + arrivalsQueue.size());
 		System.out.println(" Total still departing: " + departuresQueue.size());
 		System.out.println(" Total rejected: " + rejected.size());
 		System.out.println(" Airport was empty for: " + emptyRuns + " iterations");
 		System.out.println(" Time Airport was empty: " +(emptyRuns*100)/intervals + "%");
-		
-		System.out.println(" Average waiting time, landings: " +totalArrivalWaitingTime/landedList.size());
-		System.out.println(" Average waiting time, take-offs: " +totalDepartureWaitingTime/takenOffList.size());
+		System.out.println(" Average waiting time, landings: " +totalArrivalWaitingTime/arrived.size());
+		System.out.println(" Average waiting time, take-offs: " +totalDepartureWaitingTime/departed.size());
 	}
 	
 	private ArrayList<Airplane> getArrivals(double randNum) {

@@ -6,7 +6,7 @@ public class Main {
 		// Arguments: number of iterations, speed (10 = 250ms sleep), seedvalue to rand (should not be > 1.0),
 		// max size of the queues
 		
-		Airport airport = new Airport(20,5,0.8,10);
+		Airport airport = new Airport(100,25,0.8,10);
 		airport.run();
 	}
 
