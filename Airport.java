@@ -38,7 +38,7 @@ public class Airport extends Thread implements Runnable{
 	
 	public void run() {
 		while(counter <= intervals) {
-			System.out.print((int)counter + ": ");
+			System.out.print((int) counter + ": ");
 			
 			generateTraffic();
 			updateMean();
@@ -80,7 +80,8 @@ public class Airport extends Thread implements Runnable{
 	}
 	
 	private void updateMean() {
-		// update mean, which is passed to the randomizer on each run, making sure it doesn't run amok.
+		// update mean, which is passed to the randomizer on each run, 
+		// making sure it doesn't run amok.
 		mean = totalArrivals / counter;
 		if (mean > 1.0 || mean < 0.1)
 			mean = 0.5;
@@ -91,13 +92,15 @@ public class Airport extends Thread implements Runnable{
 			Airplane plane = arrivalsQueue.dequeue();
 			arrived.add(plane);
 			totalArrivalWaitingTime += plane.getWaiting(counter);
-			System.out.println(plane + " has landed successfully. Waiting time: " +(int)plane.getWaiting(counter));
+			System.out.println(plane + " has landed successfully. Waiting time: " 
+					+ (int) plane.getWaiting(counter));
 
 		} else if ((!departuresQueue.isEmpty())) {
 			Airplane plane = departuresQueue.dequeue();
 			departed.add(plane);
 			totalDepartureWaitingTime += plane.getWaiting(counter);
-			System.out.println(plane + " has taken off successfully. Waiting time: " +(int)plane.getWaiting(counter));
+			System.out.println(plane + " has taken off successfully. Waiting time: " 
+					+ (int) plane.getWaiting(counter));
 
 		} else {
 			emptyRuns++;
@@ -113,9 +116,9 @@ public class Airport extends Thread implements Runnable{
 		System.out.println(" Total still departing: " + departuresQueue.size());
 		System.out.println(" Total rejected: " + rejected.size());
 		System.out.println(" Airport was empty for: " + emptyRuns + " iterations");
-		System.out.println(" Time Airport was empty: " + (emptyRuns*100)/intervals + "%");
-		System.out.println(" Average waiting time, landings: " + totalArrivalWaitingTime/arrived.size());
-		System.out.println(" Average waiting time, take-offs: " + totalDepartureWaitingTime/departed.size());
+		System.out.println(" Time Airport was empty: " + (emptyRuns*100) / intervals + "%");
+		System.out.println(" Avg waiting time, landings: " + totalArrivalWaitingTime / arrived.size());
+		System.out.println(" Avg waiting time, take-offs: " + totalDepartureWaitingTime / departed.size());
 	}
 	
 	private ArrayList<Airplane> getPlanes(double randNum, Boolean isArrival) {
@@ -144,8 +147,11 @@ public class Airport extends Thread implements Runnable{
 	}
 	
 	public static void main(String[] args) {
-		// Arguments: number of iterations, speed (lower == faster), seedvalue to rand (should not be > 1.0),
-		// max size of the queues
+		/* Arguments: 
+		   number of iterations,
+		   speed (lower == faster),
+		   seedvalue to rand (should not be > 1.0),
+		   max size of the queues */
 		
 		Airport airport = new Airport(100,0,0.8,10);
 		airport.run();
