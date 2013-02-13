@@ -4,7 +4,8 @@ public class Airplane {
 	
 	
 	private int id;
-	private Boolean arriving = false;
+	@SuppressWarnings("unused")
+	private Boolean arriving;
 	private double timeCreated;
 	
 	public Airplane(int id, Boolean arriving, double timeCreated) {
@@ -12,7 +13,6 @@ public class Airplane {
 		this.id = id;
 		this.arriving = arriving;
 	}
-
 	
 	public double getWaiting(double currTime) {
 		return currTime - timeCreated;
@@ -27,11 +27,7 @@ public class Airplane {
 	}
 	
 	public String toString() {
-		if(arriving)
-			return "Flight_" +id;
-		else
-			return "Flight_" +id;
-		
+		return "Flight_" +id;
 	}
 
 }
