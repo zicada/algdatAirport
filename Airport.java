@@ -5,7 +5,7 @@ import java.util.Random;
 
 public class Airport extends Thread implements Runnable{
 	
-	private int timeSlice;
+	private int speed;
 	private int intervals;
 	private double counter;
 	private double mean;
@@ -21,11 +21,11 @@ public class Airport extends Thread implements Runnable{
 	private ArrayList<Airplane> departed;
 	private ArrayList<Airplane> rejected;
 	
-	public Airport(int intervals, int timeSlice, double mean, int maxPlanesPerQueue) {
+	public Airport(int intervals, int speed, double mean, int maxPlanesPerQueue) {
 		counter = 1;
 		ids = 0;
 		totalArrivals = 0;
-		this.timeSlice = timeSlice;
+		this.speed = speed;
 		this.intervals = intervals;
 		this.mean = mean;
 		this.maxPlanesPerQueue = maxPlanesPerQueue;
@@ -37,55 +37,15 @@ public class Airport extends Thread implements Runnable{
 	}
 	
 	public void run() {
-		
 		while(counter <= intervals) {
-			System.out.print(counter + ": ");
+			System.out.print((int)counter + ": ");
 			
-			for (Airplane arrival : getArrivals(mean)) {
-				
-				if((arrivalsQueue.size() > maxPlanesPerQueue)) {
-					rejected.add(arrival);
-					System.out.println(arrival + " cannot land because the queue is full");
-				} else {
-					arrivalsQueue.enqueue(arrival);
-					totalArrivals++;
-					System.out.println(arrival + " is coming in for landing");
-				}
-			}
-			// update mean, which is passed to the randomizer on each run, making sure it doesn't run amok.
-			mean = totalArrivals / counter;
-			if (mean > 1.0 || mean < 0.1)
-				mean = 0.5;
-			
-			for (Airplane departure : getDepartures(mean)) {
-				if((departuresQueue.size() > maxPlanesPerQueue)) {
-					rejected.add(departure);
-					System.out.println(departure + " cannot take off because the queue is full");
-				} else {
-					departuresQueue.enqueue(departure);
-					System.out.println(departure + " is about to take off");
-				}
-			}
-			
-			if((!arrivalsQueue.isEmpty())) {
-				Airplane plane = arrivalsQueue.dequeue();
-				arrived.add(plane);
-				totalArrivalWaitingTime += (plane.getWaiting(counter));
-				System.out.println(plane + " has landed successfully. Waiting time: " +(int)plane.getWaiting(counter));
-
-			} else if ((!departuresQueue.isEmpty())) {
-				Airplane plane = departuresQueue.dequeue();
-				departed.add(plane);
-				totalDepartureWaitingTime += (plane.getWaiting(counter));
-				System.out.println(plane + " has taken off successfully. Waiting time: " +(int)plane.getWaiting(counter));
-
-			} else {
-				emptyRuns++;
-				System.out.println("The airport is empty");
-			}
+			generateTraffic();
+			updateMean();
+			processTraffic();
 			
 			try {
-				Thread.sleep(timeSlice *25);
+				Thread.sleep(speed);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -95,8 +55,57 @@ public class Airport extends Thread implements Runnable{
 				printReport();
 		}
 	}
+		
+	private void generateTraffic() {
+		for (Airplane arrival : getArrivals(mean)) {
+			if((arrivalsQueue.size() >= maxPlanesPerQueue)) {
+				rejected.add(arrival);
+				System.out.println(arrival + " cannot land because the queue is full");
+			} else {
+				arrivalsQueue.enqueue(arrival);
+				totalArrivals++;
+				System.out.println(arrival + " is coming in for landing");
+			}
+		}
+		
+		for (Airplane departure : getDepartures(mean)) {
+			if((departuresQueue.size() >= maxPlanesPerQueue)) {
+				rejected.add(departure);
+				System.out.println(departure + " cannot take off because the queue is full");
+			} else {
+				departuresQueue.enqueue(departure);
+				System.out.println(departure + " wants to take off");
+			}
+		}
+	}
 	
-	public void printReport() {
+	private void updateMean() {
+		// update mean, which is passed to the randomizer on each run, making sure it doesn't run amok.
+		mean = totalArrivals / counter;
+		if (mean > 1.0 || mean < 0.1)
+			mean = 0.5;
+	}
+	
+	private void processTraffic() {
+		if((!arrivalsQueue.isEmpty())) {
+			Airplane plane = arrivalsQueue.dequeue();
+			arrived.add(plane);
+			totalArrivalWaitingTime += (plane.getWaiting(counter));
+			System.out.println(plane + " has landed successfully. Waiting time: " +(int)plane.getWaiting(counter));
+
+		} else if ((!departuresQueue.isEmpty())) {
+			Airplane plane = departuresQueue.dequeue();
+			departed.add(plane);
+			totalDepartureWaitingTime += (plane.getWaiting(counter));
+			System.out.println(plane + " has taken off successfully. Waiting time: " +(int)plane.getWaiting(counter));
+
+		} else {
+			emptyRuns++;
+			System.out.println("The airport is empty");
+		}
+	}
+	
+	private void printReport() {
 		System.out.println("\n ******* Results after " + intervals + " intervals ******\n ");
 		System.out.println(" Total landed: " + arrived.size());
 		System.out.println(" Total taken off: " + departed.size());
@@ -142,6 +151,14 @@ public class Airport extends Thread implements Runnable{
 			k++;
 		} while (p > L);
 		return k - 1;
+	}
+	
+	public static void main(String[] args) {
+		// Arguments: number of iterations, speed (lower == faster), seedvalue to rand (should not be > 1.0),
+		// max size of the queues
+		
+		Airport airport = new Airport(100,0,0.8,10);
+		airport.run();
 	}
 
 }
