@@ -5,29 +5,27 @@ import java.util.Random;
 
 public class Airport extends Thread implements Runnable{
 	
-	private int speed;
 	private int intervals;
 	private double time;
-	private double mean;
+	private double avgArrivals;
+	private double avgDepartures;
 	private int ids;
 	private int maxPlanesPerQueue;
 	private int emptyRuns;
 	private double totalArrivalWaitingTime;
 	private double totalDepartureWaitingTime;
-	private double totalArrivals;
 	private LinkedQueue<Airplane> arrivalsQueue;
 	private LinkedQueue<Airplane> departuresQueue;
 	private ArrayList<Airplane> arrived;
 	private ArrayList<Airplane> departed;
 	private ArrayList<Airplane> rejected;
 	
-	public Airport(int intervals, int speed, double mean, int maxPlanesPerQueue) {
+	public Airport(int intervals, double avgIn, double avgOut, int maxPlanesPerQueue) {
 		time = 1;
 		ids = 0;
-		totalArrivals = 0;
-		this.speed = speed;
 		this.intervals = intervals;
-		this.mean = mean;
+		this.avgArrivals = avgIn;
+		this.avgDepartures = avgOut;
 		this.maxPlanesPerQueue = maxPlanesPerQueue;
 		arrivalsQueue = new LinkedQueue<Airplane>();
 		departuresQueue = new LinkedQueue<Airplane>();
@@ -37,39 +35,47 @@ public class Airport extends Thread implements Runnable{
 	}
 	
 	public void run() {
+		if(avgArrivals + avgDepartures > 1.0) {
+			System.err.println("The sum of average arrivals and departures can not exceed 1.0.\n" +
+					" Setting both values to 0.5");
+			avgArrivals = 0.5;
+			avgDepartures = 0.5;
+		}
+		
+		printStart();
+		
 		while(time <= intervals) {
 			System.out.print((int) time + ": ");
 			
 			generateTraffic();
-			updateMean();
-			processTraffic();
-			
-			try {
-				Thread.sleep(speed);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			handleTraffic();
 			
 			time++;
 			
+			System.out.println();
 			if(time > intervals)
 				printReport();
 		}
 	}
 		
+	private void printStart() {
+		System.out.println("\n Starting simulation. " + intervals + " intervals to go");
+		System.out.println(" Average arrivals per interval: " + avgArrivals);
+		System.out.println(" Average departures per interval: " + avgDepartures + "\n");	
+	}
+
 	private void generateTraffic() {
-		for (Airplane arrival : getPlanes(mean, true)) {
+		for (Airplane arrival : getPlanes(avgArrivals, true)) {
 			if((arrivalsQueue.size() >= maxPlanesPerQueue)) {
 				rejected.add(arrival);
 				System.out.println(arrival + " cannot land because the queue is full");
 			} else {
 				arrivalsQueue.enqueue(arrival);
-				totalArrivals++;
 				System.out.println(arrival + " is coming in for landing");
 			}
 		}
 		
-		for (Airplane departure : getPlanes(mean, false)) {
+		for (Airplane departure : getPlanes(avgDepartures, false)) {
 			if((departuresQueue.size() >= maxPlanesPerQueue)) {
 				rejected.add(departure);
 				System.out.println(departure + " cannot take off because the queue is full");
@@ -80,15 +86,7 @@ public class Airport extends Thread implements Runnable{
 		}
 	}
 	
-	private void updateMean() {
-		// update mean, which is passed to the randomizer on each run, 
-		// making sure it doesn't run amok.
-		mean = totalArrivals / time;
-		if (mean > 1.0 || mean < 0.1)
-			mean = 0.5;
-	}
-	
-	private void processTraffic() {
+	private void handleTraffic() {
 		if((!arrivalsQueue.isEmpty())) {
 			Airplane plane = arrivalsQueue.dequeue();
 			arrived.add(plane);
@@ -150,11 +148,11 @@ public class Airport extends Thread implements Runnable{
 	public static void main(String[] args) {
 		/* Arguments: 
 		   number of iterations,
-		   speed (lower == faster),
-		   seedvalue to rand (should not be > 1.0),
+		   average arrivals per iteration,
+		   average departures per iteration,
 		   max size of the queues */
 		
-		Airport airport = new Airport(100,0,0.8,10);
+		Airport airport = new Airport(100,0.6,0.4,10);
 		airport.run();
 	}
 
