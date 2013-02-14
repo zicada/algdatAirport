@@ -3,7 +3,7 @@ package com.algdat.oblig1;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class Airport extends Thread implements Runnable{
+public class Airport {
 	
 	private int intervals;
 	private double time;
