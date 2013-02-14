@@ -59,9 +59,11 @@ public class Airport extends Thread implements Runnable{
 	}
 		
 	private void printStart() {
-		System.out.println("\n Starting simulation. " + intervals + " intervals to go");
-		System.out.println(" Average arrivals per interval: " + avgArrivals);
-		System.out.println(" Average departures per interval: " + avgDepartures + "\n");	
+		System.out.println(" ******************************************************");
+		System.out.println("\tStarting simulation: " + intervals + " intervals to go");
+		System.out.println("\tAverage arrivals per interval: " + avgArrivals);
+		System.out.println("\tAverage departures per interval: " + avgDepartures); 
+		System.out.println("\n *******************************************************\n");	
 	}
 
 	private void generateTraffic() {
